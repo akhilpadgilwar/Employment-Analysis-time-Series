@@ -1,0 +1,241 @@
+
+
+Approach 2: Increasing window method
+
+
+-----------------------------------------importing data for window 1-------------------------------------------------------------------------------
+apptest_males1 = window(diff_male,start=as.Date(as.character("01/01/1988"),format="%d/%m/%Y"),end=as.Date(as.character("01/12/1988"),format="%d/%m/%Y"))
+test_males1
+apptrain_males1 = window(diff_male,start=as.Date(as.character("01/01/1977"),format="%d/%m/%Y"),end=as.Date(as.character("01/12/1987"),format="%d/%m/%Y"))
+train_males1
+
+plot(train_males1,type='l',xlab='time',ylab='value')
+qqnorm(train_males1)
+qqline(train_males1,col=2)
+acf(coredata(train_males1),plot=T,lag=15)
+pacf(coredata(train_males1),plot=T,lag=15)
+
+-----------------------------------------Models for window 1-------------------------------------------------------------------------------
+
+
+EACF(coredata(apptrain_males1))
+arma14=arima(coredata(apptrain_males1), order=c(1,0,4),method='ML')
+arma14
+auto.arima(coredata(apptrain_males1), max.P=15, max.Q=15, ic="aic")
+arma12=arima(coredata(apptrain_males1), order=c(1,0,2),method='ML')
+arma12
+pacf(coredata(apptrain_males1),plot=T,lag=15)
+acf(coredata(apptrain_males1),plot=T,lag=15)
+pacf(coredata(apptrain_males1),plot=T,lag=15)
+acf(coredata(apptrain_males1),plot=T,lag=15)
+pacf(coredata(apptrain_males1),plot=T,lag=15)
+acf(coredata(apptrain_males1),plot=T,lag=15)
+ar3=arima(coredata(apptrain_males1), order=c(3,0,0),method='ML')
+ar3
+ma3=arima(coredata(apptrain_males1), order=c(0,0,3),method='ML')
+ma3
+ma6=arima(coredata(apptrain_males1), order=c(0,0,6),method='ML')
+ma6
+arma33=arima(coredata(apptrain_males1), order=c(3,0,3),method='ML')
+arma33
+arma36=arima(coredata(apptrain_males1), order=c(3,0,6),method='ML')
+arma36
+-----------------------------------------residual of window 1----------------------------------------------------------------------------
+
+jarque.bera.test(ar3$residual)
+Box.test(ar3$residuals,lag=5,type='Ljung')
+Box.test(ar3$residuals,lag=10,type='Ljung')
+Box.test(ar3$residuals,lag=15,type='Ljung')
+Box.test(ar3$residuals,lag=100,type='Ljung') 
+
+jarque.bera.test(ma3$residual)
+Box.test(ma3$residuals,lag=5,type='Ljung')
+Box.test(ma3$residuals,lag=10,type='Ljung')
+Box.test(ma3$residuals,lag=15,type='Ljung')
+Box.test(ma3$residuals,lag=100,type='Ljung') 
+
+
+jarque.bera.test(ma6$residual)
+Box.test(ma6$residuals,lag=5,type='Ljung')
+Box.test(ma6$residuals,lag=10,type='Ljung')
+Box.test(ma6$residuals,lag=15,type='Ljung')
+Box.test(ma6$residuals,lag=100,type='Ljung') 
+
+jarque.bera.test(arma36$residual)
+Box.test(arma36$residuals,lag=5,type='Ljung')
+Box.test(arma36$residuals,lag=10,type='Ljung')
+Box.test(arma36$residuals,lag=15,type='Ljung')
+Box.test(arma36$residuals,lag=100,type='Ljung') 
+
+jarque.bera.test(arma33$residual)
+Box.test(arma33$residuals,lag=5,type='Ljung')
+Box.test(arma33$residuals,lag=10,type='Ljung')
+Box.test(arma33$residuals,lag=15,type='Ljung')
+Box.test(arma33$residuals,lag=100,type='Ljung') 
+
+-----------------------------------------Evaluation of window 1-------------------------------------------------------------------------------
+
+ar3_t=arima(coredata(ratevalue_log), order=c(3,1,0),method='ML')
+ma3_t=arima(coredata(ratevalue_log), order=c(0,1,3),method='ML')
+ma6_t=arima(coredata(ratevalue_log), order=c(0,1,6),method='ML')
+arma33_t=arima(coredata(ratevalue_log), order=c(3,1,3),method='ML')
+arma36_t=arima(coredata(ratevalue_log), order=c(3,1,6),method='ML')
+arma14_t=arima(coredata(ratevalue_log), order=c(1,1,4),method='ML')
+arma12_t=arima(coredata(ratevalue_log), order=c(1,1,2),method='ML')
+str(apptest_males1)
+pred_ar3=predict(ar3_t,n.ahead=12)
+pred_ma3=predict(ma3_t,n.ahead=12)
+pred_ma6=predict(ma6_t,n.ahead=12)
+pred_arma33=predict(arma33_t,n.ahead=12)
+pred_arma36=predict(arma36_t,n.ahead=12)
+pred_arma14=predict(arma14_t,n.ahead=12)
+pred_arma12=predict(arma12_t,n.ahead=12)
+err_ar3=regr.eval(coredata(apptest_males1),pred_ar3$pred)
+err_ma3=regr.eval(coredata(apptest_males1),pred_ma3$pred)
+err_ma6=regr.eval(coredata(apptest_males1),pred_ma6$pred)
+err_arma33=regr.eval(coredata(apptest_males1),pred_arma33$pred)
+err_arma36=regr.eval(coredata(apptest_males1),pred_arma36$pred)
+err_arma14=regr.eval(coredata(apptest_males1),pred_arma14$pred)
+err_arma12=regr.eval(coredata(apptest_males1),pred_arma12$pred)
+appfold1_males_error = rbind(err_ar3,err_ma3,err_ma6,err_arma33,err_arma36,err_arma14,err_arma12)
+appfold1_males_error
+
+-----------------------------------------importing data for window 2-------------------------------------------------------------------------------
+
+
+apptest_males2 = window(diff_male,start=as.Date(as.character("01/01/1998"),format="%d/%m/%Y"),end=as.Date(as.character("01/12/1998"),format="%d/%m/%Y"))
+apptest_males2
+apptrain_males2 = window(diff_male,start=as.Date(as.character("01/01/1977"),format="%d/%m/%Y"),end=as.Date(as.character("01/12/1997"),format="%d/%m/%Y"))
+apptrain_males2
+
+-----------------------------------------Models for window 2-------------------------------------------------------------------------------
+EACF(coredata(apptrain_males2))
+arma14=arima(coredata(apptrain_males2), order=c(1,0,4),method='ML')
+arma14
+auto.arima(coredata(apptrain_males2), max.P=15, max.Q=15, ic="aic")
+arma22=arima(coredata(apptrain_males2), order=c(2,0,2),method='ML')
+arma22
+
+
+-----------------------------------------residual of window 2----------------------------------------------------------------------------
+
+
+jarque.bera.test(arma14$residual)
+Box.test(arma14$residuals,lag=5,type='Ljung')
+Box.test(arma14$residuals,lag=10,type='Ljung')
+Box.test(arma14$residuals,lag=15,type='Ljung')
+Box.test(arma14$residuals,lag=100,type='Ljung') 
+
+jarque.bera.test(arma22$residual)
+Box.test(arma22$residuals,lag=5,type='Ljung')
+Box.test(arma22$residuals,lag=10,type='Ljung')
+Box.test(arma22$residuals,lag=15,type='Ljung')
+Box.test(arma22$residuals,lag=100,type='Ljung') 
+-----------------------------------------residual of window 2----------------------------------------------------------------------------
+
+jarque.bera.test(arma36$residual)
+jarque.bera.test(arma24$residual)
+Box.test(arma36$residuals,lag=5,type='Ljung')
+Box.test(arma36$residuals,lag=10,type='Ljung')
+Box.test(arma36$residuals,lag=15,type='Ljung')
+Box.test(arma36$residuals,lag=100,type='Ljung') 
+
+-----------------------------------------Evaluation of window 2-------------------------------------------------------------------------------
+arma14_t=arima(coredata(ratevalue_log), order=c(1,1,4),method='ML')
+arma22_t=arima(coredata(ratevalue_log), order=c(2,1,2),method='ML')
+str(apptest_males2)
+pred_arma14=predict(arma14_t,n.ahead=12)
+pred_arma22=predict(arma22_t,n.ahead=12)
+err_arma14=regr.eval(coredata(apptest_males2),pred_arma14$pred)
+err_arma22=regr.eval(coredata(apptest_males2),pred_arma22$pred)
+appfold2_males_error = rbind(err_arma14,err_arma22)
+appfold2_males_error
+
+
+-----------------------------------------importing data for window 3-------------------------------------------------------------------------------
+
+apptest_males3 = window(diff_male,start=as.Date(as.character("01/01/2008"),format="%d/%m/%Y"),end=as.Date(as.character("01/12/2008"),format="%d/%m/%Y"))
+apptest_males3
+apptrain_males3 = window(diff_male,start=as.Date(as.character("01/01/1977"),format="%d/%m/%Y"),end=as.Date(as.character("01/12/2007"),format="%d/%m/%Y"))
+apptrain_males3
+
+
+-----------------------------------------Models for window 3-------------------------------------------------------------------------------
+EACF(coredata(apptrain_males3))
+arma14=arima(coredata(apptrain_males3), order=c(1,0,4),method='ML')
+arma14
+auto.arima(coredata(apptrain_males3), max.P=15, max.Q=15, ic="aic")
+arma12=arima(coredata(apptrain_males3), order=c(1,0,2),method='ML')
+arma12
+
+-----------------------------------------residual of window 3----------------------------------------------------------------------------
+
+
+jarque.bera.test(arma14$residual)
+Box.test(arma14$residuals,lag=5,type='Ljung')
+Box.test(arma14$residuals,lag=10,type='Ljung')
+Box.test(arma14$residuals,lag=15,type='Ljung')
+Box.test(arma14$residuals,lag=100,type='Ljung') 
+
+jarque.bera.test(arma12$residual)
+Box.test(arma12$residuals,lag=5,type='Ljung')
+Box.test(arma12$residuals,lag=10,type='Ljung')
+Box.test(arma12$residuals,lag=15,type='Ljung')
+Box.test(arma12$residuals,lag=100,type='Ljung')
+-----------------------------------------Evaluation of window 3-------------------------------------------------------------------------------
+arma14_t=arima(coredata(ratevalue_log), order=c(1,1,4),method='ML')
+arma12_t=arima(coredata(ratevalue_log), order=c(1,1,2),method='ML')
+str(apptest_males3)
+pred_arma14=predict(arma14_t,n.ahead=12)
+pred_arma12=predict(arma12_t,n.ahead=12)
+err_arma14=regr.eval(coredata(apptest_males3),pred_arma14$pred)
+err_arma12=regr.eval(coredata(apptest_males3),pred_arma12$pred)
+appfold3_males_error = rbind(err_arma14,err_arma12)
+appfold3_males_error
+
+
+-----------------------------------------importing data for window 4-------------------------------------------------------------------------------
+apptest_males4 = window(diff_male,start=as.Date(as.character("01/01/2018"),format="%d/%m/%Y"),end=as.Date(as.character("01/10/2018"),format="%d/%m/%Y"))
+apptest_males4
+apptrain_males4 = window(diff_male,start=as.Date(as.character("01/01/1977"),format="%d/%m/%Y"),end=as.Date(as.character("01/12/2017"),format="%d/%m/%Y"))
+apptrain_males4
+
+-----------------------------------------Models for window 4-------------------------------------------------------------------------------
+
+EACF(coredata(apptrain_males4))
+arma24=arima(coredata(apptrain_males4), order=c(2,0,4),method='ML')
+arma24
+auto.arima(coredata(apptrain_males4), max.P=15, max.Q=15, ic="aic")
+arma12=arima(coredata(apptrain_males4), order=c(1,0,2),method='ML')
+arma12
+
+
+-----------------------------------------residual of window 4----------------------------------------------------------------------------
+
+
+jarque.bera.test(arma24$residual)
+Box.test(arma24$residuals,lag=5,type='Ljung')
+Box.test(arma24$residuals,lag=10,type='Ljung')
+Box.test(arma24$residuals,lag=15,type='Ljung')
+Box.test(arma24$residuals,lag=100,type='Ljung') 
+
+jarque.bera.test(arma12$residual)
+Box.test(arma12$residuals,lag=5,type='Ljung')
+Box.test(arma12$residuals,lag=10,type='Ljung')
+Box.test(arma12$residuals,lag=15,type='Ljung')
+Box.test(arma12$residuals,lag=100,type='Ljung')
+
+-----------------------------------------Evaluation of window 4-------------------------------------------------------------------------------
+arma24_t=arima(coredata(ratevalue_log), order=c(2,1,4),method='ML')
+arma12_t=arima(coredata(ratevalue_log), order=c(1,1,2),method='ML')
+str(apptest_males4)
+pred_arma24=predict(arma24_t,n.ahead=10)
+pred_arma12=predict(arma12_t,n.ahead=10)
+err_arma24=regr.eval(coredata(apptest_males4),pred_arma24$pred)
+err_arma12=regr.eval(coredata(apptest_males4),pred_arma12$pred)
+appfold4_males_error = rbind(err_arma24,err_arma12)
+appfold4_males_error
+
+
+
+
